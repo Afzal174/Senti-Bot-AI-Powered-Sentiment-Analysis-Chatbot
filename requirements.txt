@@ -1,4 +1,10 @@
 flask
+flask-cors
 gunicorn
+groq
+python-dotenv
+spotipy
+firebase-admin
+twilio
 transformers
 torch
