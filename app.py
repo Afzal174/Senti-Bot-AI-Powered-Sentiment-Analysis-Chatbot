@@ -73,20 +73,23 @@ def home():
 # Initialize Groq client
 api_key = os.getenv("GROQ_API_KEY")
 if not api_key:
-    raise ValueError("GROQ_API_KEY not found in environment variables")
-
-try:
-    client = Groq(api_key=api_key)
+    print("Warning: GROQ_API_KEY not found. Chatbot will run in limited mode.")
+    client = None
     MODEL = "llama-3.3-70b-versatile"
-except KeyboardInterrupt:
-    print("Warning: Groq client initialization interrupted. Retrying...")
-    import time
-    time.sleep(2)
-    client = Groq(api_key=api_key)
-    MODEL = "llama-3.3-70b-versatile"
-except Exception as e:
-    print(f"Error initializing Groq client: {e}")
-    raise
+else:
+    try:
+        client = Groq(api_key=api_key)
+        MODEL = "llama-3.3-70b-versatile"
+    except KeyboardInterrupt:
+        print("Warning: Groq client initialization interrupted. Retrying...")
+        import time
+        time.sleep(2)
+        client = Groq(api_key=api_key)
+        MODEL = "llama-3.3-70b-versatile"
+    except Exception as e:
+        print(f"Error initializing Groq client: {e}")
+        client = None
+        MODEL = "llama-3.3-70b-versatile"
 
 # Initialize Spotify client
 spotify_client_id = os.getenv("SPOTIPY_CLIENT_ID")
@@ -426,6 +429,12 @@ def analyze_sentiment():
         ] + conversation_history
 
         # Call Groq API
+        if not client:
+            return jsonify({
+                "success": False,
+                "error": "Groq API not configured. Please set GROQ_API_KEY environment variable."
+            }), 503
+
         chat_completion = client.chat.completions.create(
             messages=messages,
             model=MODEL,
