@@ -1,0 +1,9 @@
+flask
+flask-cors
+groq
+python-dotenv
+colorama
+twilio
+spotipy
+firebase-admin
+certifi

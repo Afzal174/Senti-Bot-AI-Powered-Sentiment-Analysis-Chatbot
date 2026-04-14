@@ -1,0 +1,31 @@
+# Environment variables
+.env
+Cache files (IMPORTANT 🔥)
+.cache
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Firebase credentials (security)
+firebase-credentials.json
