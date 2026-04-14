@@ -5,7 +5,7 @@ const ChatHistory = ({ user, onLoadChat, isOpen, onClose }) => {
   const [chatSessions, setChatSessions] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = '/api';
 
   useEffect(() => {
     if (isOpen && user) {

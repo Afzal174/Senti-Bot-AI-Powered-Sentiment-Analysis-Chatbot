@@ -24,7 +24,7 @@ const Dashboard = ({ user }) => {
     setLoading(true);
     try {
       // Load mood history (currently not implemented in backend)
-      // const moodResponse = await axios.get(`http://localhost:5000/api/mood_history?username=${user.username}`);
+      // const moodResponse = await axios.get(`/api/mood_history?username=${user.username}`);
       // if (moodResponse.data.success) {
       //   processMoodData(moodResponse.data.mood_history);
       // }
@@ -39,7 +39,7 @@ const Dashboard = ({ user }) => {
       processMoodData(sampleMoodData);
 
       // Load goals
-      const goalsResponse = await axios.get(`http://localhost:5000/api/goals?username=${user.username}`);
+      const goalsResponse = await axios.get(`/api/goals?username=${user.username}`);
       if (goalsResponse.data.success) {
         const goals = goalsResponse.data.goals;
         const completedGoals = goals.filter(goal => goal.status === 'Completed').length;
@@ -47,13 +47,13 @@ const Dashboard = ({ user }) => {
       }
 
       // Load journal entries
-      const journalResponse = await axios.get(`http://localhost:5000/api/journal?username=${user.username}`);
+      const journalResponse = await axios.get(`/api/journal?username=${user.username}`);
       if (journalResponse.data.success) {
         setStats(prev => ({ ...prev, journalEntries: journalResponse.data.entries.length }));
       }
 
       // Load chat sessions
-      const chatResponse = await axios.get(`http://localhost:5000/api/chat_sessions?username=${user.username}`);
+      const chatResponse = await axios.get(`/api/chat_sessions?username=${user.username}`);
       if (chatResponse.data.success) {
         setStats(prev => ({ ...prev, totalChats: chatResponse.data.sessions.length }));
       }

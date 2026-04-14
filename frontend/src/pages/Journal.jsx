@@ -18,7 +18,7 @@ const Journal = ({ user }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`http://localhost:5000/api/journal?username=${username}`);
+      const response = await axios.get(`/api/journal?username=${username}`);
       if (response.data.success) {
         // Transform backend data to frontend format
         const formattedEntries = response.data.entries.map((entry, index) => ({
@@ -43,7 +43,7 @@ const Journal = ({ user }) => {
     if (newEntry.title && newEntry.content) {
       setSaving(true);
       try {
-        const response = await axios.post('http://localhost:5000/api/journal', {
+        const response = await axios.post('/api/journal', {
           username,
           content: `${newEntry.title}\n\n${newEntry.content}`
         });

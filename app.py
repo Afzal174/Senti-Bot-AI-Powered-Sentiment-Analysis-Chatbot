@@ -10,7 +10,7 @@ import json
 from datetime import datetime, timedelta
 from email.message import EmailMessage
 import smtplib
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
 from groq import Groq
 from dotenv import load_dotenv
@@ -71,7 +71,17 @@ except Exception as e:
 
 @app.route("/")
 def home():
+    import pathlib
+    dist_path = pathlib.Path(__file__).parent / "frontend" / "dist" / "index.html"
+    if dist_path.exists():
+        return send_from_directory(str(dist_path.parent), "index.html")
     return render_template("index.html")
+
+@app.route("/assets/<path:filename>")
+def serve_assets(filename):
+    import pathlib
+    dist_path = pathlib.Path(__file__).parent / "frontend" / "dist" / "assets"
+    return send_from_directory(str(dist_path), filename)
 
 # Initialize Groq client
 api_key = os.getenv("GROQ_API_KEY")

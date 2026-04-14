@@ -5,7 +5,7 @@ import ChatInput from '../components/ChatInput';
 import ChatHistory from '../components/ChatHistory';
 import './Chat.css';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = '/api';
 
 const Chat = ({ user }) => {
   const [messages, setMessages] = useState([]);

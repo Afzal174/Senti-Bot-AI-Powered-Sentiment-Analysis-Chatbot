@@ -24,7 +24,7 @@ const Profile = ({ user }) => {
   const loadProfileData = async () => {
     try {
       // Fetch the latest profile data from backend
-      const response = await axios.get('http://localhost:5000/api/profile', {
+      const response = await axios.get('/api/profile', {
         params: { username: user.username }
       });
 
@@ -76,7 +76,7 @@ const Profile = ({ user }) => {
 
     setSaving(true);
     try {
-      const response = await axios.put('http://localhost:5000/api/profile', {
+      const response = await axios.put('/api/profile', {
         username: user.username,
         email: profile.email,
         phone: profile.phone,

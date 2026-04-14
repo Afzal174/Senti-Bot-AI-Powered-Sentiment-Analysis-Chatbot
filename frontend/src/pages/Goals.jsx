@@ -25,7 +25,7 @@ const Goals = ({ user }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`http://localhost:5000/api/goals?username=${user.username}`);
+      const response = await axios.get(`/api/goals?username=${user.username}`);
       if (response.data.success) {
         setGoals(response.data.goals.map(goal => ({
           ...goal,
@@ -45,7 +45,7 @@ const Goals = ({ user }) => {
     e.preventDefault();
     if (newGoal.title && user?.username) {
       try {
-        const response = await axios.post('http://localhost:5000/api/goals', {
+        const response = await axios.post('/api/goals', {
           username: user.username,
           content: `${newGoal.title}\n${newGoal.description || ''}\nCategory: ${newGoal.category}\nDeadline: ${newGoal.deadline || 'No deadline'}`
         });
@@ -65,7 +65,7 @@ const Goals = ({ user }) => {
 
   const updateGoalStatus = async (id, status) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/goals/${id}`, {
+      const response = await axios.put(`/api/goals/${id}`, {
         status: status
       });
 
@@ -89,7 +89,7 @@ const Goals = ({ user }) => {
 
   const deleteGoal = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/api/goals/${id}`);
+      const response = await axios.delete(`/api/goals/${id}`);
 
       if (response.data.success) {
         await loadGoals(); // Reload goals
