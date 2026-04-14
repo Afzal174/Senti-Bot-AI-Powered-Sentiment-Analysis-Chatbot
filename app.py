@@ -2,11 +2,6 @@
 SENTIBOT - Simple Flask API Backend
 Provides basic REST API for React frontend chatbot
 """
-from flask import Flask
-import os
-
-app = Flask(__name__)
-
 import os
 import sqlite3
 import random
@@ -15,13 +10,24 @@ import json
 from datetime import datetime, timedelta
 from email.message import EmailMessage
 import smtplib
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from groq import Groq
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from spotipy.exceptions import SpotifyException, SpotifyBaseException
+
+# Initialize Flask app
+app = Flask(__name__)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "Accept"],
+        "supports_credentials": True
+    }
+})
 
 # Initialize Twilio client (optional) - will be initialized after load_dotenv()
 twilio_client = None
@@ -63,12 +69,9 @@ except ImportError:
 except Exception as e:
     print(f"Error initializing Firebase Admin SDK: {e}. FCM notifications disabled.")
 
-app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization", "Accept"], "supports_credentials": True}})  # Enable CORS for React frontend
-
 @app.route("/")
 def home():
-    return "SentiBot Running Successfully 🚀"
+    return render_template("index.html")
 
 # Initialize Groq client
 api_key = os.getenv("GROQ_API_KEY")

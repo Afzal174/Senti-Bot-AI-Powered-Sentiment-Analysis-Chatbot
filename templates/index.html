@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SentiBot 💬</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+        }
+        #chatbox {
+            width: 400px;
+            margin: 50px auto;
+        }
+        input {
+            width: 70%;
+            padding: 10px;
+        }
+        button {
+            padding: 10px;
+            background: #22c55e;
+            border: none;
+            color: white;
+        }
+        #messages {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🤖 SentiBot Chat</h1>
+
+<div id="chatbox">
+    <input id="msg" placeholder="Type message..." />
+    <button onclick="sendMessage()">Send</button>
+    <div id="messages"></div>
+</div>
+
+<script>
+function sendMessage() {
+    let msg = document.getElementById("msg").value;
+
+    fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: msg, session_id: "default", username: "guest" })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById("messages").innerHTML += 
+                "<p><b>You:</b> " + msg + "</p>" +
+                "<p><b>Bot:</b> " + data.response + "</p>";
+        } else {
+            document.getElementById("messages").innerHTML += 
+                "<p><b>You:</b> " + msg + "</p>" +
+                "<p><b>Bot:</b> " + data.error + "</p>";
+        }
+    });
+}
+</script>
+
+</body>
+</html>
