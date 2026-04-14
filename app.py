@@ -66,6 +66,10 @@ except Exception as e:
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization", "Accept"], "supports_credentials": True}})  # Enable CORS for React frontend
 
+@app.route("/")
+def home():
+    return "SentiBot Running Successfully 🚀"
+
 # Initialize Groq client
 api_key = os.getenv("GROQ_API_KEY")
 if not api_key:
