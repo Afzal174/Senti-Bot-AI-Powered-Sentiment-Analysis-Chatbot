@@ -110,7 +110,7 @@ const Chat = ({ user }) => {
         setCrisisAlert({
           message: "I've detected that you might be going through a difficult time. Your safety is important to me.",
           timestamp: new Date().toLocaleTimeString(),
-          emergencyContacts: user?.emergency_email || user?.emergency_phone
+          emergencyContacts: user?.emergencyEmail || user?.emergencyPhone
         });
 
         // Auto-hide crisis alert after 10 seconds

@@ -62,7 +62,7 @@ const ChatHistory = ({ user, onLoadChat, isOpen, onClose }) => {
       const response = await axios.delete(`${API_BASE_URL}/chat_sessions/${sessionId}`);
       if (response.data.success) {
         // Refresh the chat sessions list
-        loadChatSessions();
+         await loadChatSessions();
       }
     } catch (error) {
       console.error('Error deleting chat:', error);
