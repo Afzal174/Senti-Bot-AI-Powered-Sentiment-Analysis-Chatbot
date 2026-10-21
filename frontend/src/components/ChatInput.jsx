@@ -53,24 +53,36 @@ const ChatInput = ({ onSendMessage, loading }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="chat-input">
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Type your message or click the microphone..."
-        disabled={loading}
-      />
-      <button
-        type="button"
-        className={`voice-input-btn ${isListening ? 'listening' : ''}`}
-        onClick={isListening ? stopListening : startListening}
-        disabled={loading}
-        title={isListening ? "Stop listening" : "Start voice input"}
-      >
-        {isListening ? '🎙️' : '🎤'}
-      </button>
-      <button type="submit" disabled={loading || !input.trim()}>Send</button>
+    <form onSubmit={handleSubmit} className="chat-input-modern">
+      <div className="chat-input-container">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your message here..."
+          disabled={loading}
+          className="chat-input-field"
+        />
+        <div className="chat-input-actions">
+          <button
+            type="button"
+            className={`chat-input-btn voice-btn ${isListening ? 'listening' : ''}`}
+            onClick={isListening ? stopListening : startListening}
+            disabled={loading}
+            title={isListening ? "Stop listening" : "Start voice input"}
+          >
+            {isListening ? '🎙️' : '🎤'}
+          </button>
+          <button 
+            type="submit" 
+            className="chat-input-btn send-btn" 
+            disabled={loading || !input.trim()}
+            title="Send message"
+          >
+            {loading ? '⏳' : '➤'}
+          </button>
+        </div>
+      </div>
     </form>
   );
 };

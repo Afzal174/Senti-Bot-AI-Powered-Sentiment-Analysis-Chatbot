@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './Goals.css';
 
 const Goals = ({ user }) => {
   const [goals, setGoals] = useState([]);
@@ -15,6 +16,8 @@ const Goals = ({ user }) => {
 
   const [filter, setFilter] = useState('All');
 
+  const categories = ['Personal', 'Health', 'Career', 'Wellness', 'Education', 'Finance'];
+
   useEffect(() => {
     if (user?.username) {
       loadGoals();
@@ -27,11 +30,21 @@ const Goals = ({ user }) => {
     try {
       const response = await axios.get(`/api/goals?username=${user.username}`);
       if (response.data.success) {
-        setGoals(response.data.goals.map(goal => ({
-          ...goal,
-          deadline: goal.timestamp ? goal.timestamp.split('T')[0] : '',
-          progress: goal.status === 'Completed' ? 100 : 0
-        })));
+        setGoals(response.data.goals.map(goal => {
+          const contentParts = goal.content ? goal.content.split('\n') : [];
+          const title = contentParts[0] || goal.content || 'Untitled Goal';
+          const description = contentParts[1] || '';
+          const category = contentParts.find(p => p.startsWith('Category:'))?.replace('Category: ', '') || 'Personal';
+          const deadline = contentParts.find(p => p.startsWith('Deadline:'))?.replace('Deadline: ', '') || '';
+          return {
+            ...goal,
+            title,
+            description,
+            category,
+            deadline: deadline === 'No deadline' ? '' : deadline,
+            progress: goal.status === 'Completed' ? 100 : goal.status === 'In Progress' ? 50 : 0
+          };
+        }));
       }
     } catch (err) {
       setError('Failed to load goals');
@@ -51,7 +64,7 @@ const Goals = ({ user }) => {
         });
 
         if (response.data.success) {
-          await loadGoals(); // Reload goals
+          await loadGoals();
           setNewGoal({ title: '', description: '', category: 'Personal', deadline: '' });
         } else {
           setError('Failed to save goal');
@@ -70,7 +83,7 @@ const Goals = ({ user }) => {
       });
 
       if (response.data.success) {
-        await loadGoals(); // Reload goals
+        await loadGoals();
       } else {
         setError('Failed to update goal status');
       }
@@ -80,19 +93,12 @@ const Goals = ({ user }) => {
     }
   };
 
-  const updateProgress = (id, progress) => {
-    // For now, just update local state since backend doesn't store progress separately
-    setGoals(goals.map(goal =>
-      goal.id === id ? { ...goal, progress: Math.min(100, Math.max(0, progress)) } : goal
-    ));
-  };
-
   const deleteGoal = async (id) => {
     try {
       const response = await axios.delete(`/api/goals/${id}`);
 
       if (response.data.success) {
-        await loadGoals(); // Reload goals
+        await loadGoals();
       } else {
         setError('Failed to delete goal');
       }
@@ -104,148 +110,180 @@ const Goals = ({ user }) => {
 
   const filteredGoals = filter === 'All' ? goals : goals.filter(goal => goal.status === filter);
 
-  const getStatusColor = (status) => {
+  const getStatusClass = (status) => {
     switch (status) {
-      case 'Completed': return '#28a745';
-      case 'In Progress': return '#007bff';
-      case 'Not Started': return '#6c757d';
-      default: return '#6c757d';
+      case 'Completed': return 'completed';
+      case 'In Progress': return 'in-progress';
+      case 'Not Started': return 'not-started';
+      default: return 'not-started';
+    }
+  };
+
+  const getProgress = (status) => {
+    switch (status) {
+      case 'Completed': return 100;
+      case 'In Progress': return 50;
+      case 'Not Started': return 0;
+      default: return 0;
     }
   };
 
   return (
     <div className="goals-page">
-      <div className="page-header">
-        <h1>Goals</h1>
-        <p>Set, track, and achieve your personal goals.</p>
+      <div className="goals-hero">
+        <div className="goals-hero-content">
+          <div className="goals-hero-text">
+            <h1>Goal Tracker</h1>
+            <p>Turn your dreams into achievable goals and track your progress every step of the way</p>
+          </div>
+          <div className="goals-hero-visual">
+            <div className="goals-orb goals-orb-1"></div>
+            <div className="goals-orb goals-orb-2"></div>
+            <div className="goals-target">🎯</div>
+          </div>
+        </div>
       </div>
 
-      <div className="goals-content">
-        <div className="new-goal-card">
-          <h3>Create New Goal</h3>
-          <form onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Goal Title</label>
-                <input
-                  type="text"
-                  placeholder="What do you want to achieve?"
-                  value={newGoal.title}
-                  onChange={(e) => setNewGoal({...newGoal, title: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Category</label>
+      <div className="goals-main">
+        <div className="new-goal-card-modern">
+          <div className="new-goal-header">
+            <h2>✨ Create New Goal</h2>
+            <p>Set your next achievement</p>
+          </div>
+          <form onSubmit={handleSubmit} className="goals-form">
+            <div className="form-group-modern">
+              <label className="form-label">Goal Title</label>
+              <input
+                type="text"
+                className="form-input-modern"
+                placeholder="What do you want to achieve?"
+                value={newGoal.title}
+                onChange={(e) => setNewGoal({...newGoal, title: e.target.value})}
+                required
+              />
+            </div>
+            <div className="form-row-modern">
+              <div className="form-group-modern">
+                <label className="form-label">Category</label>
                 <select
+                  className="form-select-modern"
                   value={newGoal.category}
                   onChange={(e) => setNewGoal({...newGoal, category: e.target.value})}
                 >
-                  <option value="Personal">Personal</option>
-                  <option value="Health">Health</option>
-                  <option value="Career">Career</option>
-                  <option value="Wellness">Wellness</option>
-                  <option value="Education">Education</option>
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
                 </select>
               </div>
+              <div className="form-group-modern">
+                <label className="form-label">Deadline</label>
+                <input
+                  type="date"
+                  className="form-input-modern"
+                  value={newGoal.deadline}
+                  onChange={(e) => setNewGoal({...newGoal, deadline: e.target.value})}
+                />
+              </div>
             </div>
-            <div className="form-group">
-              <label>Description</label>
+            <div className="form-group-modern">
+              <label className="form-label">Description</label>
               <textarea
-                placeholder="Describe your goal in detail..."
+                className="form-textarea-modern"
+                placeholder="Describe your goal and why it's important..."
                 value={newGoal.description}
                 onChange={(e) => setNewGoal({...newGoal, description: e.target.value})}
                 rows="3"
               />
             </div>
-            <div className="form-group">
-              <label>Deadline</label>
-              <input
-                type="date"
-                value={newGoal.deadline}
-                onChange={(e) => setNewGoal({...newGoal, deadline: e.target.value})}
-              />
-            </div>
-            <button type="submit" className="btn-primary">Create Goal</button>
+            <button type="submit" className="create-goal-btn">
+              <span>🎯</span>
+              <span>Create Goal</span>
+            </button>
           </form>
         </div>
 
-        <div className="goals-filters">
-          <div className="filter-buttons">
-            {['All', 'In Progress', 'Completed', 'Not Started'].map(status => (
-              <button
-                key={status}
-                className={`filter-btn ${filter === status ? 'active' : ''}`}
-                onClick={() => setFilter(status)}
-              >
-                {status}
-              </button>
-            ))}
+        <div className="goals-section">
+          <div className="goals-section-header">
+            <h2>🚀 My Goals</h2>
+            <div className="filter-tabs">
+              {['All', 'Not Started', 'In Progress', 'Completed'].map(status => (
+                <button
+                  key={status}
+                  className={`filter-tab ${filter === status ? 'active' : ''}`}
+                  onClick={() => setFilter(status)}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className="goals-list">
-          {filteredGoals.map(goal => (
-            <div key={goal.id} className="goal-card">
-              <div className="goal-header">
-                <div className="goal-info">
-                  <h4>{goal.title}</h4>
-                  <div className="goal-meta">
-                    <span className="category">{goal.category}</span>
-                    <span className="deadline">Due: {goal.deadline}</span>
+          {loading ? (
+            <div className="journal-loading">
+              <div className="loading-spinner-journal"></div>
+              <p>Loading your goals...</p>
+            </div>
+          ) : filteredGoals.length === 0 ? (
+            <div className="goals-empty">
+              <span className="goals-empty-icon">🎯</span>
+              <h3>No goals yet</h3>
+              <p>Create your first goal to start tracking your progress</p>
+            </div>
+          ) : (
+            <div className="goals-grid">
+              {filteredGoals.map((goal, index) => (
+                <div key={goal.id} className="goal-card-modern" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <div className="goal-card-header">
+                    <div className="goal-title-section">
+                      <h3>{goal.title}</h3>
+                      <div className="goal-meta-tags">
+                        <span className="goal-category-tag">{goal.category}</span>
+                        {goal.deadline && <span className="goal-deadline-tag">📅 {goal.deadline}</span>}
+                      </div>
+                    </div>
+                    <span className={`goal-status-badge ${getStatusClass(goal.status)}`}>
+                      {goal.status}
+                    </span>
+                  </div>
+                  
+                  {goal.description && (
+                    <p className="goal-description-text">{goal.description}</p>
+                  )}
+                  
+                  <div className="goal-progress-section">
+                    <div className="goal-progress-header">
+                      <span className="goal-progress-label">Progress</span>
+                      <span className="goal-progress-value">{getProgress(goal.status)}%</span>
+                    </div>
+                    <div className="goal-progress-bar-container">
+                      <div 
+                        className="goal-progress-bar-fill" 
+                        style={{ width: `${getProgress(goal.status)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  
+                  <div className="goal-actions-row">
+                    <select
+                      value={goal.status}
+                      onChange={(e) => updateGoalStatus(goal.id, e.target.value)}
+                      className="goal-status-select"
+                    >
+                      <option value="Not Started">Not Started</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                    <button
+                      className="goal-delete-btn"
+                      onClick={() => deleteGoal(goal.id)}
+                    >
+                      🗑️ Delete
+                    </button>
                   </div>
                 </div>
-                <div className="goal-status">
-                  <span
-                    className="status-badge"
-                    style={{ backgroundColor: getStatusColor(goal.status) }}
-                  >
-                    {goal.status}
-                  </span>
-                </div>
-              </div>
-
-              <p className="goal-description">{goal.description}</p>
-
-              <div className="goal-progress">
-                <div className="progress-header">
-                  <span>Progress: {goal.progress}%</span>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={goal.progress}
-                    onChange={(e) => updateProgress(goal.id, parseInt(e.target.value))}
-                    className="progress-input"
-                  />
-                </div>
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${goal.progress}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div className="goal-actions">
-                <select
-                  value={goal.status}
-                  onChange={(e) => updateGoalStatus(goal.id, e.target.value)}
-                  className="status-select"
-                >
-                  <option value="Not Started">Not Started</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-                <button
-                  className="btn-danger small"
-                  onClick={() => deleteGoal(goal.id)}
-                >
-                  Delete
-                </button>
-              </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

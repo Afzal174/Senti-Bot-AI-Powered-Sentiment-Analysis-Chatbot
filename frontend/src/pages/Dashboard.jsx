@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import './Dashboard.css';
 
 const Dashboard = ({ user }) => {
+  const navigate = useNavigate();
   const [moodData, setMoodData] = useState([]);
   const [weeklyData, setWeeklyData] = useState([]);
   const [stats, setStats] = useState({
@@ -23,13 +26,6 @@ const Dashboard = ({ user }) => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // Load mood history (currently not implemented in backend)
-      // const moodResponse = await axios.get(`/api/mood_history?username=${user.username}`);
-      // if (moodResponse.data.success) {
-      //   processMoodData(moodResponse.data.mood_history);
-      // }
-
-      // For now, use sample mood data
       const sampleMoodData = {
         'Happy': 5,
         'Neutral': 3,
@@ -38,7 +34,6 @@ const Dashboard = ({ user }) => {
       };
       processMoodData(sampleMoodData);
 
-      // Load goals
       const goalsResponse = await axios.get(`/api/goals?username=${user.username}`);
       if (goalsResponse.data.success) {
         const goals = goalsResponse.data.goals;
@@ -46,19 +41,16 @@ const Dashboard = ({ user }) => {
         setStats(prev => ({ ...prev, goalsCompleted: completedGoals }));
       }
 
-      // Load journal entries
       const journalResponse = await axios.get(`/api/journal?username=${user.username}`);
       if (journalResponse.data.success) {
         setStats(prev => ({ ...prev, journalEntries: journalResponse.data.entries.length }));
       }
 
-      // Load chat sessions
       const chatResponse = await axios.get(`/api/chat_sessions?username=${user.username}`);
       if (chatResponse.data.success) {
         setStats(prev => ({ ...prev, totalChats: chatResponse.data.sessions.length }));
       }
 
-      // Generate recent activity
       generateRecentActivity();
 
     } catch (error) {
@@ -69,13 +61,12 @@ const Dashboard = ({ user }) => {
   };
 
   const processMoodData = (moodHistory) => {
-    // Process mood data for charts
     const moodColors = {
-      'Happy': '#28a745',
-      'Sad': '#dc3545',
-      'Anxious': '#ffc107',
-      'Angry': '#dc3545',
-      'Neutral': '#6c757d'
+      'Happy': '#10b981',
+      'Sad': '#ef4444',
+      'Anxious': '#f59e0b',
+      'Angry': '#dc2626',
+      'Neutral': '#64748b'
     };
 
     const moodCounts = {};
@@ -87,13 +78,12 @@ const Dashboard = ({ user }) => {
     const pieData = Object.keys(moodCounts).map(mood => ({
       name: mood,
       value: moodCounts[mood],
-      color: moodColors[mood] || '#6c757d'
+      color: moodColors[mood] || '#64748b'
     }));
 
     setMoodData(pieData);
 
-    // Calculate average mood (simplified)
-    const moodValues = { 'Happy': 8, 'Neutral': 5, 'Sad': 3, 'Anxious': 4, 'Angry': 2 };
+    const moodValues = { 'Happy': 9, 'Neutral': 6, 'Sad': 3, 'Anxious': 4, 'Angry': 2 };
     let weightedSum = 0;
     Object.keys(moodCounts).forEach(mood => {
       weightedSum += moodValues[mood] * moodCounts[mood];
@@ -101,48 +91,88 @@ const Dashboard = ({ user }) => {
     const averageMood = total > 0 ? (weightedSum / total).toFixed(1) : 0;
     setStats(prev => ({ ...prev, averageMood }));
 
-    // Generate weekly data (simplified - would need real time-based data)
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const weeklyMood = days.map(day => ({
+    const weeklyMood = days.map((day, index) => ({
       day,
-      mood: Math.floor(Math.random() * 5) + 5 // Random mood 5-9 for demo
+      mood: Math.floor(Math.random() * 3) + 6
     }));
     setWeeklyData(weeklyMood);
   };
 
   const generateRecentActivity = () => {
-    // This would ideally come from a combined API endpoint
-    // For now, create sample recent activity
     const activities = [
       {
         icon: '💬',
-        content: 'Chat session with SentiBot',
-        time: '2 hours ago'
+        content: 'Started a new chat session',
+        time: '2 hours ago',
+        type: 'chat'
       },
       {
         icon: '🎵',
-        content: 'Discovered new music recommendations',
-        time: '1 day ago'
+        content: 'Discovered mood-based music recommendations',
+        time: '1 day ago',
+        type: 'music'
       },
       {
         icon: '📝',
-        content: 'Added journal entry',
-        time: '2 days ago'
+        content: 'Wrote a reflection in journal',
+        time: '2 days ago',
+        type: 'journal'
       },
       {
         icon: '🎯',
         content: 'Completed goal: "Practice mindfulness"',
-        time: '3 days ago'
+        time: '3 days ago',
+        type: 'goal'
+      },
+      {
+        icon: '🧘',
+        content: 'Completed breathing exercise',
+        time: '4 days ago',
+        type: 'wellness'
       }
     ];
     setRecentActivity(activities);
   };
 
+  const quickActions = [
+    { icon: '💬', label: 'Start Chat', path: '/chat', gradient: 'linear-gradient(135deg, #6366f1 0%, #3b82f6 100%)' },
+    { icon: '📝', label: 'Write Journal', path: '/journal', gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
+    { icon: '🎯', label: 'Set Goal', path: '/goals', gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' },
+    { icon: '🧘', label: 'Wellness Tools', path: '/wellness', gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)' },
+    { icon: '🎵', label: 'Music Therapy', path: '/music', gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }
+  ];
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip">
+          <p className="tooltip-label">{payload[0].name}</p>
+          <p className="tooltip-value">{payload[0].value} times</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const CustomBarTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip">
+          <p className="tooltip-label">{label}</p>
+          <p className="tooltip-value">Mood: {payload[0].value}/10</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (loading) {
     return (
       <div className="dashboard-page">
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <p>Loading your dashboard...</p>
+        <div className="dashboard-loading">
+          <div className="loading-spinner"></div>
+          <p>Loading your wellness dashboard...</p>
         </div>
       </div>
     );
@@ -150,93 +180,180 @@ const Dashboard = ({ user }) => {
 
   return (
     <div className="dashboard-page">
-      <div className="dashboard-header">
-        <h1>Welcome to SentiBot Dashboard</h1>
-        <p>Track your emotional well-being and discover insights about your mood patterns.</p>
+      <div className="dashboard-hero">
+        <div className="hero-content">
+          <h1 className="hero-title">
+            Welcome back, <span className="hero-username">{user?.username || 'User'}</span>
+          </h1>
+          <p className="hero-subtitle">Your emotional wellness journey at a glance</p>
+          <div className="hero-stats">
+            <div className="hero-stat">
+              <span className="hero-stat-value">{stats.totalChats}</span>
+              <span className="hero-stat-label">Chat Sessions</span>
+            </div>
+            <div className="hero-stat-divider"></div>
+            <div className="hero-stat">
+              <span className="hero-stat-value">{stats.journalEntries}</span>
+              <span className="hero-stat-label">Reflections</span>
+            </div>
+            <div className="hero-stat-divider"></div>
+            <div className="hero-stat">
+              <span className="hero-stat-value">{stats.goalsCompleted}</span>
+              <span className="hero-stat-label">Goals Achieved</span>
+            </div>
+          </div>
+        </div>
+        <div className="hero-visual">
+          <div className="hero-orb orb-1"></div>
+          <div className="hero-orb orb-2"></div>
+          <div className="hero-orb orb-3"></div>
+        </div>
       </div>
 
       <div className="stats-grid">
-        <div className="stat-card">
+        <div className="stat-card stat-card-primary">
+          <div className="stat-card-header">
+            <div className="stat-icon">💬</div>
+            <span className="stat-badge">Active</span>
+          </div>
           <h3>Total Chats</h3>
           <div className="stat-number">{stats.totalChats}</div>
-          <p className="stat-change positive">Chat sessions</p>
+          <p className="stat-change positive">↗ Conversations with SentiBot</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card stat-card-success">
+          <div className="stat-card-header">
+            <div className="stat-icon">😊</div>
+            <span className="stat-badge">Well-being</span>
+          </div>
           <h3>Average Mood</h3>
-          <div className="stat-number">{stats.averageMood}</div>
-          <p className="stat-change positive">Based on conversations</p>
+          <div className="stat-number">{stats.averageMood}<span className="stat-number-suffix">/10</span></div>
+          <p className="stat-change positive">Based on your interactions</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card stat-card-warning">
+          <div className="stat-card-header">
+            <div className="stat-icon">🎯</div>
+            <span className="stat-badge">Progress</span>
+          </div>
           <h3>Goals Completed</h3>
           <div className="stat-number">{stats.goalsCompleted}</div>
-          <p className="stat-change positive">Goals achieved</p>
+          <p className="stat-change positive">Great achievement!</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card stat-card-info">
+          <div className="stat-card-header">
+            <div className="stat-icon">📝</div>
+            <span className="stat-badge">Growth</span>
+          </div>
           <h3>Journal Entries</h3>
           <div className="stat-number">{stats.journalEntries}</div>
-          <p className="stat-change positive">Reflections written</p>
+          <p className="stat-change positive">Self-reflection count</p>
         </div>
       </div>
 
-      <div className="charts-grid">
-        <div className="chart-card">
-          <h3>Mood Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
+      <div className="charts-section">
+        <div className="chart-card chart-card-large">
+          <div className="chart-card-header">
+            <div>
+              <h3>🧠 Mood Distribution</h3>
+              <p className="chart-subtitle">Emotional patterns from your conversations</p>
+            </div>
+            <div className="chart-legend">
+              {moodData.map((entry, index) => (
+                <div key={index} className="legend-item">
+                  <span className="legend-color" style={{ backgroundColor: entry.color }}></span>
+                  <span className="legend-label">{entry.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={320}>
             <PieChart>
               <Pie
                 data={moodData}
                 cx="50%"
                 cy="50%"
-                outerRadius={80}
-                fill="#8884d8"
+                innerRadius={70}
+                outerRadius={110}
+                paddingAngle={4}
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
                 {moodData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} stroke="rgba(0,0,0,0.3)" strokeWidth={2} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="chart-card">
-          <h3>Weekly Mood Trend</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={weeklyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" />
-              <YAxis domain={[0, 10]} />
-              <Tooltip />
-              <Bar dataKey="mood" fill="#007bff" />
-            </BarChart>
+        <div className="chart-card chart-card-large">
+          <div className="chart-card-header">
+            <div>
+              <h3>📈 Weekly Mood Trend</h3>
+              <p className="chart-subtitle">Your emotional journey this week</p>
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={320}>
+            <AreaChart data={weeklyData}>
+              <defs>
+                <linearGradient id="colorMood" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(99, 102, 241, 0.2)" />
+              <XAxis dataKey="day" stroke="#64748b" />
+              <YAxis domain={[0, 10]} stroke="#64748b" />
+              <Tooltip content={<CustomBarTooltip />} />
+              <Area type="monotone" dataKey="mood" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorMood)" />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="recent-activity">
-        <h3>Recent Activity</h3>
-        <div className="activity-list">
-          {recentActivity.map((activity, index) => (
-            <div key={index} className="activity-item">
-              <div className="activity-icon">{activity.icon}</div>
-              <div className="activity-content">
-                <p>{activity.content}</p>
-                <span>{activity.time}</span>
+      <div className="bottom-section">
+        <div className="activity-card">
+          <div className="activity-card-header">
+            <h3>🕒 Recent Activity</h3>
+            <span className="activity-badge">Latest</span>
+          </div>
+          <div className="activity-list">
+            {recentActivity.map((activity, index) => (
+              <div key={index} className="activity-item" style={{ animationDelay: `${index * 0.1}s` }}>
+                <div className={`activity-icon-wrapper activity-${activity.type}`}>
+                  <span className="activity-icon">{activity.icon}</span>
+                </div>
+                <div className="activity-content">
+                  <p className="activity-text">{activity.content}</p>
+                  <span className="activity-time">{activity.time}</span>
+                </div>
+                <div className="activity-arrow">→</div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="quick-actions">
-        <h3>Quick Actions</h3>
-        <div className="action-buttons">
-          <button className="action-btn primary">Start Chat</button>
-          <button className="action-btn secondary">Write Journal</button>
-          <button className="action-btn secondary">Set Goal</button>
-          <button className="action-btn secondary">Wellness Tools</button>
+        <div className="actions-card">
+          <div className="actions-card-header">
+            <h3>⚡ Quick Actions</h3>
+            <p className="actions-subtitle">Jump into your wellness activities</p>
+          </div>
+          <div className="action-buttons-grid">
+            {quickActions.map((action, index) => (
+              <button 
+                key={index} 
+                className="action-btn-modern" 
+                style={{ 
+                  background: action.gradient,
+                  animationDelay: `${index * 0.1}s`
+                }}
+                onClick={() => navigate(action.path)}
+              >
+                <span className="action-btn-icon">{action.icon}</span>
+                <span className="action-btn-label">{action.label}</span>
+                <span className="action-btn-arrow">→</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

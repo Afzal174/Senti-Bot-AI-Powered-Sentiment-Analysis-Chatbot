@@ -8,7 +8,6 @@ const ChatMessage = ({ message }) => {
   const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      // Could add a toast notification here
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -20,18 +19,15 @@ const ChatMessage = ({ message }) => {
       return;
     }
 
-    // Stop any current speech
     if (speechRef.current) {
       window.speechSynthesis.cancel();
     }
 
-    // Create new speech utterance
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9; // Slightly slower for clarity
+    utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.volume = 0.8;
 
-    // Set voice (prefer female voices for bot)
     const setVoice = () => {
       const voices = window.speechSynthesis.getVoices();
       const preferredVoice = voices.find(voice =>
@@ -44,12 +40,10 @@ const ChatMessage = ({ message }) => {
       if (preferredVoice) {
         utterance.voice = preferredVoice;
       } else if (voices.length > 0) {
-        // Fallback to first available voice
         utterance.voice = voices[0];
       }
     };
 
-    // Voices might not be loaded yet, so try immediately and also listen for voiceschanged
     setVoice();
     if (window.speechSynthesis.getVoices().length === 0) {
       window.speechSynthesis.onvoiceschanged = setVoice;
@@ -61,7 +55,6 @@ const ChatMessage = ({ message }) => {
       speechRef.current = null;
     };
     utterance.onerror = (event) => {
-      // Only log real errors, not 'interrupted' which is normal when speech is cancelled
       if (event.error !== 'interrupted') {
         console.error('Speech synthesis error:', event);
       }
@@ -81,20 +74,6 @@ const ChatMessage = ({ message }) => {
     }
   };
 
-  // Auto-speak only the latest bot message (disabled by default to prevent continuous speech)
-  // Users can manually click the speaker button to hear messages
-  // useEffect(() => {
-  //   if (message.bot && 'speechSynthesis' in window) {
-  //     // Small delay to ensure the message is rendered and user can see it
-  //     const timer = setTimeout(() => {
-  //       speakText(message.bot);
-  //     }, 1000); // 1 second delay
-
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [message.bot]);
-
-  // Cleanup speech when component unmounts
   useEffect(() => {
     return () => {
       if (speechRef.current) {
@@ -112,12 +91,14 @@ const ChatMessage = ({ message }) => {
           onMouseLeave={() => setShowActions(false)}
         >
           <div className="message-content">
-            <div className="message-text">{message.user}</div>
-            <div className="message-footer">
+            <div className="message-bubble user-bubble">
+              <div className="message-text">{message.user}</div>
+            </div>
+            <div className="message-footer user-footer">
               <span className="message-time">{message.timestamp}</span>
               {showActions && (
                 <button
-                  className="message-action"
+                  className="message-action-btn"
                   onClick={() => copyToClipboard(message.user)}
                   title="Copy message"
                 >
@@ -134,23 +115,28 @@ const ChatMessage = ({ message }) => {
           onMouseEnter={() => setShowActions(true)}
           onMouseLeave={() => setShowActions(false)}
         >
+          <div className="message-avatar">
+            <span>🤖</span>
+          </div>
           <div className="message-content">
-            <div className="message-text">{message.bot}</div>
-            <div className="message-footer">
+            <div className="message-bubble bot-bubble">
+              <div className="message-text">{message.bot}</div>
+            </div>
+            <div className="message-footer bot-footer">
               <span className="message-time">{message.timestamp}</span>
               {showActions && (
-                <div className="message-actions">
+                <div className="message-actions-group">
                   <button
-                    className="message-action"
+                    className="message-action-btn"
                     onClick={() => copyToClipboard(message.bot)}
                     title="Copy message"
                   >
                     📋
                   </button>
                   <button
-                    className="message-action voice-btn"
+                    className={`message-action-btn voice-action ${isSpeaking ? 'speaking' : ''}`}
                     onClick={isSpeaking ? stopSpeaking : () => speakText(message.bot)}
-                    title={isSpeaking ? "Stop speaking" : "Re-speak message"}
+                    title={isSpeaking ? "Stop speaking" : "Listen to message"}
                   >
                     {isSpeaking ? '🔇' : '🔊'}
                   </button>
