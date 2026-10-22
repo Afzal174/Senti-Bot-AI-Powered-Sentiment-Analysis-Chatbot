@@ -98,7 +98,7 @@ else:
         import time
         time.sleep(2)
         client = Groq(api_key=api_key)
-        MODEL = "llama-3.3-70b-versatile"
+        MODEL = "openai/gpt-oss-120b"
     except Exception as e:
         print(f"Error initializing Groq client: {e}")
         client = None
