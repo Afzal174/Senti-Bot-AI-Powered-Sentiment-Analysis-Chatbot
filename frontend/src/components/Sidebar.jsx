@@ -20,7 +20,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, user, onLogout }) => {
       <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
       <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <h2>SentiBot</h2>
           <button className="close-btn" onClick={() => setSidebarOpen(false)}>×</button>
         </div>
 

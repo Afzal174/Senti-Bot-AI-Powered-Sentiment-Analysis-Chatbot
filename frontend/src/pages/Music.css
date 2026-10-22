@@ -263,9 +263,31 @@
 }
 
 .music-grid-modern {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  display: flex;
+  flex-direction: row;
   gap: 1.25rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.75rem;
+  scroll-behavior: smooth;
+}
+
+.music-grid-modern::-webkit-scrollbar {
+  height: 8px;
+}
+
+.music-grid-modern::-webkit-scrollbar-track {
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 4px;
+}
+
+.music-grid-modern::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 4px;
+}
+
+.music-grid-modern::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
 }
 
 .music-card-modern {
@@ -280,6 +302,8 @@
   position: relative;
   animation: slideUp 0.5s ease-out;
   animation-fill-mode: both;
+  flex: 0 0 280px;
+  min-width: 280px;
 }
 
 .music-card-modern::before {

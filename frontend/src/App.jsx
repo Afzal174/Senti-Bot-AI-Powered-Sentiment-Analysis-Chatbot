@@ -79,7 +79,7 @@ function App() {
           color: '#007bff',
           fontSize: '1.2rem'
         }}>
-          Loading SentiBot...
+          Loading Senti-Bot AI Chatbot Assistant...
         </div>
       </div>
     );
@@ -102,7 +102,7 @@ function App() {
           >
             ☰
           </button>
-          <h1>SentiBot</h1>
+          <h1>Senti-Bot AI Wellness Chatbot Assistant</h1>
         </header>
 
         <main className="content">

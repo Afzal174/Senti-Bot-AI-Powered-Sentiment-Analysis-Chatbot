@@ -190,7 +190,7 @@ const Chat = ({ user }) => {
             </div>
             <div className="chat-header-info">
               <h2 className="chat-title-modern">
-                SentiBot
+                Senti-Bot AI Chatbot Assistant
                 {isAutoSaving && <span className="auto-save-indicator-modern">💾 Saving...</span>}
               </h2>
               <p className="chat-subtitle">Your AI Emotional Companion • Always here to listen</p>
@@ -256,7 +256,7 @@ const Chat = ({ user }) => {
           {messages.length === 0 && (
             <div className="welcome-screen">
               <div className="welcome-icon">🤖</div>
-              <h3 className="welcome-title">Welcome to SentiBot</h3>
+              <h3 className="welcome-title">Welcome to Senti-Bot AI Chatbot Assistant</h3>
               <p className="welcome-text">I'm here to listen, support, and chat with you. Start a conversation by typing a message below.</p>
               <div className="welcome-suggestions">
                 <button className="suggestion-chip" onClick={() => sendMessage("Hello, how are you?")}>👋 Say Hello</button>
@@ -284,7 +284,7 @@ const Chat = ({ user }) => {
                       <span></span>
                       <span></span>
                     </div>
-                    <span className="typing-text-modern">SentiBot is thinking...</span>
+                    <span className="typing-text-modern">Senti-Bot AI Chatbot Assistant is thinking...</span>
                   </div>
                 </div>
               </div>

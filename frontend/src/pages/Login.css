@@ -271,3 +271,43 @@
     grid-template-columns: 1fr;
   }
 }
+/* Responsive - tablets and small desktops */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .login-container {
+    max-width: 440px;
+    padding: 2.25rem;
+  }
+  .login-features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Responsive - large desktops */
+@media (min-width: 1025px) {
+  .login-page {
+    padding: 3rem;
+  }
+  .login-container {
+    max-width: 500px;
+    padding: 3rem;
+  }
+  .login-header h1 {
+    font-size: 2.25rem;
+  }
+}
+
+/* Responsive - very small screens */
+@media (max-width: 360px) {
+  .login-page {
+    padding: 0.75rem;
+  }
+  .login-container {
+    padding: 1.5rem 1.25rem;
+  }
+  .login-header h1 {
+    font-size: 1.5rem;
+  }
+  .login-logo {
+    font-size: 2.5rem;
+  }
+}
